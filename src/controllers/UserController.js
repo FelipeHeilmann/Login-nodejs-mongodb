@@ -1,11 +1,40 @@
 import Users from '../models/userModel.js'
-import {validateFields, validatePass, createHash} from '../validations/validate.js'
+import jwt from 'jsonwebtoken'
+import {validateFields, validatePass, createHash, checkPass} from '../validations/validate.js'
 
 
 class UserController{
 
     static getUserEmail = async(email)=>{
         return await Users.findOne({email: email})
+    }
+
+    static loginUser = async(req,res)=>{
+        const {email,password} = req.body
+        if(validateFields(email, password)){
+            return res.status(422).json({message: "the fields cant be empty"})
+        }
+        const user= await UserController.getUserEmail(email)
+        if(!user){
+            return res.status(422).json({message: "User was not found"})
+        }
+
+        if(!checkPass(password, user.password)){
+            return res.status(422).json({message: "password incorrect!"})
+        }
+
+        try{
+            const secret = process.env.SECRET
+            const token = jwt.sign({
+                id: user._id,
+                },
+                secret
+            )
+            return res.status(201).json({message: "user authenticated", token})
+        }
+        catch(err){
+            return res.status(401).json({message: err.message})
+        }
     }
 
     static insertUser = async(req, res)=>{
@@ -35,9 +64,8 @@ class UserController{
             return res.status(200).json(newUser)
         }
         catch(err){
-            return res.status(500).json({messa: err.message})
+            return res.status(500).json({message: err.message})
         }
-
     }
 }
 

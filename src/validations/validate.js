@@ -17,5 +17,9 @@ async function createHash(pass){
     return passHash
 }
 
+async function checkPass(pass, userPass){
+    return await bcrypt.compare(pass, userPass)
+}
 
-export {validateFields, validatePass, createHash}
+
+export {validateFields, validatePass, createHash, checkPass}
