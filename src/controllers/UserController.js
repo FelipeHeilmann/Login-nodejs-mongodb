@@ -19,7 +19,8 @@ class UserController{
             return res.status(422).json({message: "User was not found"})
         }
 
-        if(!checkPass(password, user.password)){
+        const checkedPass = await checkPass(password, user.password)
+        if(!checkedPass){
             return res.status(422).json({message: "password incorrect!"})
         }
 
@@ -65,6 +66,18 @@ class UserController{
         }
         catch(err){
             return res.status(500).json({message: err.message})
+        }
+
+    }
+
+    static getUsetInfo = async(req,res)=>{
+        const {id} = req.params
+        const user = await Users.findById(id, '-password')
+        if(!user){
+            return res.status(400).json({message: "user was not found"})
+        }
+        else{
+            return res.status(200).json({user})
         }
     }
 }

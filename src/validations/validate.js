@@ -1,6 +1,6 @@
-import bcrypt from 'bcrypt';
 
-function validateFields(name, email, password){
+
+function validateFields(req, res){
     if(!name && !email && !password){
         return false
     }
@@ -18,8 +18,10 @@ async function createHash(pass){
 }
 
 async function checkPass(pass, userPass){
-    return await bcrypt.compare(pass, userPass)
+    const result = await bcrypt.compare(pass, userPass)
+    return result
 }
+
 
 
 export {validateFields, validatePass, createHash, checkPass}
